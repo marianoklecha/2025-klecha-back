@@ -1,0 +1,68 @@
+package com.medibook.api.service;
+
+import com.medibook.api.dto.Family.FamilyMemberCreateRequestDTO;
+import com.medibook.api.dto.Family.FamilyMemberDTO;
+import com.medibook.api.entity.FamilyMember;
+import com.medibook.api.entity.User;
+import com.medibook.api.repository.FamilyMemberRepository;
+import com.medibook.api.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class FamilyService {
+
+    private final FamilyMemberRepository familyMemberRepository;
+    private final UserRepository userRepository;
+
+    @Transactional
+    public FamilyMemberDTO createFamilyMember(UUID holderId, FamilyMemberCreateRequestDTO dto) {
+        User holder = userRepository.findById(holderId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario titular no encontrado"));
+
+        if (userRepository.existsByDni(dto.getDni())) {
+             throw new IllegalArgumentException("El DNI ya pertenece a un usuario registrado");
+        }
+        if (familyMemberRepository.existsByDni(dto.getDni())) {
+             throw new IllegalArgumentException("El DNI ya pertenece a un familiar registrado");
+        }
+
+        FamilyMember familyMember = new FamilyMember();
+        familyMember.setHolder(holder);
+        familyMember.setName(dto.getName());
+        familyMember.setSurname(dto.getSurname());
+        familyMember.setDni(dto.getDni());
+        familyMember.setBirthdate(dto.getBirthdate());
+        familyMember.setGender(dto.getGender());
+
+        FamilyMember savedMember = familyMemberRepository.save(familyMember);
+
+        return mapToDTO(savedMember);
+    }
+
+    @Transactional(readOnly = true)
+    public List<FamilyMemberDTO> getFamilyMembersByHolder(UUID holderId) {
+        return familyMemberRepository.findByHolderId(holderId).stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    private FamilyMemberDTO mapToDTO(FamilyMember entity) {
+        return FamilyMemberDTO.builder()
+                .id(entity.getId())
+                .holderId(entity.getHolder().getId())
+                .name(entity.getName())
+                .surname(entity.getSurname())
+                .dni(entity.getDni())
+                .birthdate(entity.getBirthdate())
+                .gender(entity.getGender())
+                .build();
+    }
+}
