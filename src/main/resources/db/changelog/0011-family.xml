@@ -63,7 +63,7 @@
     </changeSet>
 
     <changeSet id="0011-03-global-dni-check" author="MediBook_Admin">
-        <sql dbms="postgresql">
+        <sql dbms="postgresql" splitStatements="false">
             CREATE OR REPLACE FUNCTION check_dni_uniqueness() RETURNS trigger AS $$
             BEGIN
                 IF (TG_TABLE_NAME = 'family') THEN
