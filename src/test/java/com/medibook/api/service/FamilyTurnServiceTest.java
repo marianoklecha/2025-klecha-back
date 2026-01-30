@@ -39,7 +39,6 @@ class FamilyTurnServiceTest {
     @Mock
     private TurnAssignedMapper mapper;
     
-    // Mocks necesarios para evitar NullPointerExceptions en logica de emails/notificaciones
     @Mock private NotificationService notificationService;
     @Mock private EmailService emailService;
     @Mock private BadgeEvaluationTriggerService badgeEvaluationTrigger;
@@ -77,7 +76,7 @@ class FamilyTurnServiceTest {
 
         familyMember = new FamilyMember();
         familyMember.setId(familyId);
-        familyMember.setHolder(patient); // El familiar pertenece al paciente
+        familyMember.setHolder(patient); 
         familyMember.setName("Hijo");
 
         turnRequest = new TurnCreateRequestDTO();
@@ -87,7 +86,6 @@ class FamilyTurnServiceTest {
     }
 
     @Test
-    @DisplayName("Debe crear un turno exitosamente para el PACIENTE titular")
     void createTurn_ForPatient_Success() {
         // Arrange
         when(userRepo.findById(doctorId)).thenReturn(Optional.of(doctor));
@@ -117,10 +115,9 @@ class FamilyTurnServiceTest {
     }
 
     @Test
-    @DisplayName("Debe crear un turno exitosamente para un FAMILIAR")
     void createTurn_ForFamilyMember_Success() {
         // Arrange
-        turnRequest.setFamilyMemberId(familyId); // Solicitamos para familiar
+        turnRequest.setFamilyMemberId(familyId); 
 
         when(userRepo.findById(doctorId)).thenReturn(Optional.of(doctor));
         when(userRepo.findById(patientId)).thenReturn(Optional.of(patient));
@@ -130,7 +127,7 @@ class FamilyTurnServiceTest {
         TurnAssigned savedTurn = new TurnAssigned();
         savedTurn.setId(UUID.randomUUID());
         savedTurn.setScheduledAt(turnRequest.getScheduledAt());
-        savedTurn.setDoctor(doctor); // Necesario para evitar NPE en logs
+        savedTurn.setDoctor(doctor);
 
         when(turnRepo.save(any(TurnAssigned.class))).thenReturn(savedTurn);
         TurnResponseDTO responseDTO = TurnResponseDTO.builder()
@@ -150,7 +147,6 @@ class FamilyTurnServiceTest {
     }
 
     @Test
-    @DisplayName("Debe fallar si el familiar no pertenece al paciente que reserva")
     void createTurn_FamilyMemberNotBelongToPatient_ThrowsException() {
         // Arrange
         User otherUser = new User();
