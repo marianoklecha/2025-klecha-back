@@ -4,17 +4,20 @@ import com.medibook.api.dto.Turn.TurnCreateRequestDTO;
 import com.medibook.api.dto.Turn.TurnResponseDTO;
 import com.medibook.api.entity.TurnAssigned;
 import com.medibook.api.entity.User;
+import com.medibook.api.entity.FamilyMember;
 import com.medibook.api.mapper.TurnAssignedMapper;
 import com.medibook.api.entity.Rating;
 import com.medibook.api.repository.RatingRepository;
 import com.medibook.api.repository.TurnAssignedRepository;
 import com.medibook.api.repository.UserRepository;
+import com.medibook.api.repository.FamilyMemberRepository;
 import com.medibook.api.util.DateTimeUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.EntityNotFoundException;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -38,6 +41,7 @@ public class TurnAssignedService {
     private final TurnFileService turnFileService;
     private final BadgeEvaluationTriggerService badgeEvaluationTrigger;
     private final MedicalCheckApiService medicalCheckApiService;
+    private final FamilyMemberRepository familyMemberRepository;
     private static final ZoneId ARGENTINA_ZONE = ZoneId.of("America/Argentina/Buenos_Aires");
 
     public TurnResponseDTO createTurn(TurnCreateRequestDTO dto) {
@@ -70,11 +74,22 @@ public class TurnAssignedService {
             throw new RuntimeException("Time slot is already taken");
         }
 
+        FamilyMember familyMember = null;
+        if (dto.getFamilyMemberId() != null) {
+            familyMember = familyMemberRepository.findById(dto.getFamilyMemberId())
+                .orElseThrow(() -> new EntityNotFoundException("Familiar no encontrado con ID: " + dto.getFamilyMemberId()));
+            
+            if(!familyMember.getHolder().getId().equals(dto.getPatientId())) {
+                throw new IllegalArgumentException("El familiar indicado no pertenece al paciente");
+            }
+        }
+
         TurnAssigned turn = TurnAssigned.builder()
                 .doctor(doctor)
                 .patient(patient)
-            .scheduledAt(dto.getScheduledAt())
-            .motive(dto.getMotive())
+                .familyMember(familyMember)
+                .scheduledAt(dto.getScheduledAt())
+                .motive(dto.getMotive())
                 .status("SCHEDULED")
                 .build();
 

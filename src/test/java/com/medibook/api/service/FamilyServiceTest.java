@@ -29,10 +29,9 @@ class FamilyServiceTest {
 
     @Mock
     private FamilyMemberRepository familyMemberRepository;
-
     @Mock
     private UserRepository userRepository;
-
+    
     @InjectMocks
     private FamilyService familyService;
 

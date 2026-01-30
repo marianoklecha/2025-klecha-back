@@ -17,4 +17,6 @@ public class TurnCreateRequestDTO {
     private OffsetDateTime scheduledAt;
     
     private String motive;
+
+    private UUID familyMemberId;
 }
