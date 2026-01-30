@@ -15,4 +15,5 @@ public class FamilyMemberDTO {
     private Long dni;
     private LocalDate birthdate;
     private String gender;
+    private String relationship;
 }

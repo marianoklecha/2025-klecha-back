@@ -30,6 +30,9 @@
             <column name="dni" type="BIGINT">
                 <constraints nullable="false" unique="true"/>
             </column>
+            <column name="relationship" type="text">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
 
         <addForeignKeyConstraint baseTableName="family" baseColumnNames="holder_id"

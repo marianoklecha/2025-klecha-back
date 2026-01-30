@@ -37,4 +37,8 @@ public class FamilyMember {
     @NotNull
     @Column(name = "dni", nullable = false, unique = true)
     private Long dni;
+
+    @NotBlank
+    @Column(nullable = false)
+    private String relationship;
 }

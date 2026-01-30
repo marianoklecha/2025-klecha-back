@@ -24,4 +24,7 @@ public class FamilyMemberCreateRequestDTO {
 
     @NotBlank(message = "El género es obligatorio")
     private String gender;
+
+    @NotBlank(message = "El tipo de relación es obligatorio")
+    private String relationship;
 }

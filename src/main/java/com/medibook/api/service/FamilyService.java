@@ -41,6 +41,7 @@ public class FamilyService {
         familyMember.setDni(dto.getDni());
         familyMember.setBirthdate(dto.getBirthdate());
         familyMember.setGender(dto.getGender());
+        familyMember.setRelationship(dto.getRelationship());
 
         FamilyMember savedMember = familyMemberRepository.save(familyMember);
 
@@ -63,6 +64,7 @@ public class FamilyService {
                 .dni(entity.getDni())
                 .birthdate(entity.getBirthdate())
                 .gender(entity.getGender())
+                .relationship(entity.getRelationship())
                 .build();
     }
 }
