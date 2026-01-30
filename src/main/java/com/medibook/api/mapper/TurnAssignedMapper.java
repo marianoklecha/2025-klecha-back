@@ -66,6 +66,7 @@ public class TurnAssignedMapper {
                 .fileUrl(turnFile.map(TurnFile::getFileUrl).orElse(null))
                 .fileName(turnFile.map(TurnFile::getFileName).orElse(null))
                 .uploadedAt(turnFile.map(TurnFile::getUploadedAt).orElse(null))
+                .familyMemberId(turn.getFamilyMember() != null ? turn.getFamilyMember().getId() : null)
                 .build();
     }
 }

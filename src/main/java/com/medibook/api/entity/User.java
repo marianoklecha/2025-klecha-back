@@ -67,6 +67,9 @@ public class User {
     @JsonManagedReference
     private DoctorProfile doctorProfile;
 
+    @OneToMany(mappedBy = "holder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<FamilyMember> familyMembers = new ArrayList<>();
+
     public DoctorProfile getDoctorProfile() {
         return doctorProfile;
     }

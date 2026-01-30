@@ -7,6 +7,7 @@ import com.medibook.api.dto.email.EmailResponseDto;
 import com.medibook.api.entity.TurnAssigned;
 import com.medibook.api.entity.User;
 import com.medibook.api.mapper.TurnAssignedMapper;
+import com.medibook.api.repository.FamilyMemberRepository;
 import com.medibook.api.repository.TurnAssignedRepository;
 import com.medibook.api.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,6 +65,9 @@ class TurnAssignedServiceTest {
 
     @Mock
     private com.medibook.api.repository.TurnModifyRequestRepository turnModifyRequestRepository;
+
+    @Mock
+    private FamilyMemberRepository familyMemberRepository;
 
     private UUID doctorId;
     private UUID patientId;
