@@ -1,5 +1,6 @@
 package com.medibook.api.dto;
 
+import com.medibook.api.dto.Family.FamilyMemberDTO;
 import com.medibook.api.dto.Rating.SubcategoryCountDTO;
 import lombok.Builder;
 import lombok.Data;
@@ -23,4 +24,5 @@ public class PatientDTO {
     private String medicalHistory;
     private Double score;
     private List<SubcategoryCountDTO> ratingSubcategories;
+    private List<FamilyMemberDTO> familyMembers;
 }

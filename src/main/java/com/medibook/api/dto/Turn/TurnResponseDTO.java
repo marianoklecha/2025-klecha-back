@@ -13,7 +13,8 @@ public class TurnResponseDTO {
     private UUID doctorId;
     private String doctorName;
     private String doctorSpecialty;
-    private UUID patientId;     
+    private UUID patientId;
+    private UUID familyMemberId;
     private String patientName;
     private Double patientScore;
     private OffsetDateTime scheduledAt;
