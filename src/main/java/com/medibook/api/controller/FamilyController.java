@@ -45,7 +45,7 @@ public class FamilyController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/my-family")
     public ResponseEntity<Object> getMyFamilyMembers(HttpServletRequest request) {
         User authenticatedUser = (User) request.getAttribute("authenticatedUser");
 
