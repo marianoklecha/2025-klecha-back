@@ -1,42 +1,42 @@
 services:
   - type: web
-    name: medi-book-api
+    name: medibook-klecha-api
     runtime: docker
-    region: oregon
+    region: virginia
     plan: starter
     dockerfilePath: ./Dockerfile
     healthCheckPath: /actuator/health
     envVars:
       - key: DB_HOST
         fromDatabase:
-          name: medi-book-db
+          name: medibook-klecha-db
           property: host
       - key: DB_PORT
         fromDatabase:
-          name: medi-book-db
+          name: medibook-klecha-db
           property: port
       - key: DB_NAME
         fromDatabase:
-          name: medi-book-db
+          name: medibook-klecha-db
           property: database
       - key: DB_USERNAME
         fromDatabase:
-          name: medi-book-db
+          name: medibook-klecha-db
           property: username
       - key: DB_PASSWORD
         fromDatabase:
-          name: medi-book-db
+          name: medibook-klecha-db
           property: password
       - key: CORS_ALLOWED_ORIGINS
-        value: https://medi-book-web.onrender.com
+        value: https://medibook-klecha.onrender.com
       - key: ADMIN_USERNAME
         generateValue: true
       - key: ADMIN_PASSWORD
         generateValue: true
 
 databases:
-  - name: medi-book-db
-    databaseName: medibook
-    user: medi_book_user
-    region: oregon
+  - name: medibook-klecha-db
+    databaseName: medibook_klecha_db
+    user: medibook_klecha_db_user
+    region: virginia
     plan: starter
