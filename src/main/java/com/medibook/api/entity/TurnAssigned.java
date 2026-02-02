@@ -26,7 +26,6 @@ public class TurnAssigned {
     @JoinColumn(name = "patient_id")
     private User patient;
 
-
     @Column(name = "scheduled_at", nullable = false)
     private OffsetDateTime scheduledAt;
 
@@ -35,4 +34,8 @@ public class TurnAssigned {
     
     @Column(name = "motive", columnDefinition = "text")
     private String motive;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "family_member_id", nullable = true)
+    private FamilyMember familyMember;
 }

@@ -9,4 +9,5 @@ import java.util.UUID;
 public class TurnReserveRequestDTO {
     private UUID turnId;
     private UUID patientId;
+    private UUID familyMemberId;
 }
