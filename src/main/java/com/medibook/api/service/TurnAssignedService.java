@@ -169,30 +169,6 @@ public class TurnAssignedService {
         
         return mapper.toDTO(saved);
     }
-
-    public TurnAssigned reserveTurn(UUID turnId, UUID patientId) {
-        TurnAssigned turn = turnRepo.findById(turnId)
-                .orElseThrow(() -> new RuntimeException("Turn not found"));
-
-        if (!"AVAILABLE".equals(turn.getStatus())) {
-            throw new RuntimeException("Turn is not available");
-        }
-
-        User patient = userRepo.findById(patientId)
-                .orElseThrow(() -> new RuntimeException("Patient not found"));
-
-        turn.setPatient(patient);
-        turn.setStatus("RESERVED");
-        TurnAssigned saved = turnRepo.save(turn);
-
-        OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        long daysDifference = java.time.Duration.between(now, turn.getScheduledAt()).toDays();
-        if (daysDifference >= 1) {
-            badgeEvaluationTrigger.evaluateAfterAdvanceBooking(patientId);
-        }
-
-        return saved;
-    }
     
     public List<TurnResponseDTO> getTurnsByDoctor(UUID doctorId) {
         List<TurnAssigned> turns = turnRepo.findByDoctor_IdOrderByScheduledAtDesc(doctorId);
