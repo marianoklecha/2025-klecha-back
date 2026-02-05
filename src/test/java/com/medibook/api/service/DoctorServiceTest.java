@@ -42,6 +42,9 @@ class DoctorServiceTest {
     private MedicalHistoryService medicalHistoryService;
 
     @Mock
+    private FamilyService familyService;
+
+    @Mock
     private RatingRepository ratingRepository;
 
     @Mock

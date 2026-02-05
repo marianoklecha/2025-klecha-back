@@ -99,22 +99,6 @@ public class TurnAssignedController {
         return ResponseEntity.ok(availableTimes);
     }
 
-    @PostMapping("/reserve")
-    public ResponseEntity<Object> reserveTurn(
-            @RequestBody TurnReserveRequestDTO dto,
-            HttpServletRequest request) {
-        
-        User authenticatedUser = (User) request.getAttribute("authenticatedUser");
-        
-        ResponseEntity<Object> validationError = TurnAuthorizationUtil.validatePatientTurnReservation(authenticatedUser, dto.getPatientId());
-        if (validationError != null) {
-            return validationError;
-        }
-        
-        TurnAssigned result = turnService.reserveTurn(dto.getTurnId(), dto.getPatientId());
-        return ResponseEntity.ok(result);
-    }
-
     @GetMapping("/my-turns")
     public ResponseEntity<Object> getMyTurns(
             @RequestParam(required = false) String status,
