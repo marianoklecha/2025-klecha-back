@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -66,5 +67,18 @@ public class FamilyService {
                 .gender(entity.getGender())
                 .relationship(entity.getRelationship())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public Map<UUID, List<FamilyMemberDTO>> getFamilyMembersByHolder(List<UUID> holderIds) {
+        if (holderIds == null || holderIds.isEmpty()) {
+            return new java.util.HashMap<>();
+        }
+
+        List<FamilyMember> allMembers = familyMemberRepository.findByHolderIdIn(holderIds);
+
+        return allMembers.stream()
+            .map(this::mapToDTO)
+            .collect(Collectors.groupingBy(FamilyMemberDTO::getHolderId));
     }
 }

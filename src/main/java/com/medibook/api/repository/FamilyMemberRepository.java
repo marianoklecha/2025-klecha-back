@@ -11,4 +11,6 @@ public interface FamilyMemberRepository extends JpaRepository<FamilyMember, UUID
     boolean existsByDni(Long dni);
     
     List<FamilyMember> findByHolderId(UUID holderId);
+
+    List<FamilyMember> findByHolderIdIn(List<UUID> holderIds);
 }

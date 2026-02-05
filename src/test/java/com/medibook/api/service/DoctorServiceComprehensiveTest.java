@@ -42,6 +42,9 @@ class DoctorServiceComprehensiveTest {
     private MedicalHistoryService medicalHistoryService;
 
     @Mock
+    private FamilyService familyService;
+
+    @Mock
     private RatingRepository ratingRepository;
 
     @InjectMocks

@@ -1,11 +1,13 @@
 package com.medibook.api.service;
 import com.medibook.api.dto.Badge.BadgeDTO;
+import com.medibook.api.dto.Family.FamilyMemberDTO;
 import com.medibook.api.dto.DoctorDTO;
 import com.medibook.api.dto.DoctorMetricsDTO;
 import com.medibook.api.dto.MedicalHistoryDTO;
 import com.medibook.api.dto.PatientDTO;
 import com.medibook.api.dto.Rating.SubcategoryCountDTO;
 import com.medibook.api.entity.Badge;
+import com.medibook.api.entity.FamilyMember;
 import com.medibook.api.entity.TurnAssigned;
 import com.medibook.api.entity.User;
 import com.medibook.api.mapper.DoctorMapper;
@@ -33,6 +35,7 @@ public class DoctorService {
     private final TurnAssignedRepository turnAssignedRepository;
     private final DoctorMapper doctorMapper;
     private final MedicalHistoryService medicalHistoryService;
+    private final FamilyService familyService;
     private final RatingRepository ratingRepository;
     private final BadgeRepository badgeRepository;
     private final BadgeService badgeService;
@@ -77,9 +80,16 @@ public class DoctorService {
         Map<UUID, String> latestHistories = medicalHistoryService.getLatestMedicalHistoryContents(patientIds);
         
         Map<UUID, Map<String, Long>> ratingsMap = getRatingsMap(patientIds);
+
+        Map<UUID, List<FamilyMemberDTO>> familyMembersMap = familyService.getFamilyMembersByHolder(patientIds);
         
         return patients.stream()
-                .map(patient -> mapPatientToDTO(patient, latestHistories.get(patient.getId()), ratingsMap.get(patient.getId())))
+                .map(patient -> mapPatientToDTO(
+                    patient, 
+                    latestHistories.get(patient.getId()), 
+                    ratingsMap.get(patient.getId()),
+                    familyMembersMap.get(patient.getId())
+                ))
                 .collect(Collectors.toList());
     }
 
@@ -119,7 +129,7 @@ public class DoctorService {
         medicalHistoryService.addMedicalHistory(doctorId, turnId, medicalHistory);
     }
 
-    private PatientDTO mapPatientToDTO(User patient, String latestMedicalHistory, Map<String, Long> ratings) {
+    private PatientDTO mapPatientToDTO(User patient, String latestMedicalHistory, Map<String, Long> ratings, List<FamilyMemberDTO> familyMembers) {
         List<MedicalHistoryDTO> medicalHistories = medicalHistoryService.getPatientMedicalHistory(patient.getId());
         
         // latestMedicalHistory is now passed as parameter
@@ -144,6 +154,7 @@ public class DoctorService {
                 .medicalHistory(latestMedicalHistory)
                 .score(patient.getScore())
                 .ratingSubcategories(ratingSubcategories)
+                .familyMembers(familyMembers != null ? familyMembers : new java.util.ArrayList<>())
                 .build();
     }
 
