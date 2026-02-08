@@ -62,25 +62,7 @@ public class AuthController {
             return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
         }
     }
-
-    @PostMapping("/register/admin")
-    public ResponseEntity<?> registerAdmin(
-            @Valid @RequestBody RegisterRequestDTO request, 
-            HttpServletRequest httpRequest) {
-        try {
-            RegisterResponseDTO response = authService.registerAdmin(request);
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            ErrorResponseDTO error = ErrorResponseDTO.of(
-                "ADMIN_REGISTRATION_FAILED", 
-                e.getMessage(), 
-                HttpStatus.BAD_REQUEST.value(),
-                httpRequest.getRequestURI()
-            );
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-        }
-    }
-
+   
     @PostMapping("/verify")
     public ResponseEntity<?> verifyAccount(@RequestParam("token") String token) {
         try {

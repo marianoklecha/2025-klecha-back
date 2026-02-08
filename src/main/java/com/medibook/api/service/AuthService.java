@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 public interface AuthService {
     RegisterResponseDTO registerPatient(RegisterRequestDTO request);
     RegisterResponseDTO registerDoctor(RegisterRequestDTO request);
-    RegisterResponseDTO registerAdmin(RegisterRequestDTO request);
     
     void verifyAccount(String token);
     SignInResponseDTO signIn(SignInRequestDTO request);
