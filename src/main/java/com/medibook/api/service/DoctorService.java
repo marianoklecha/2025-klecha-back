@@ -2,12 +2,12 @@ package com.medibook.api.service;
 import com.medibook.api.dto.Badge.BadgeDTO;
 import com.medibook.api.dto.Family.FamilyMemberDTO;
 import com.medibook.api.dto.DoctorDTO;
+import com.medibook.api.dto.DoctorPublicDTO;
 import com.medibook.api.dto.DoctorMetricsDTO;
 import com.medibook.api.dto.MedicalHistoryDTO;
 import com.medibook.api.dto.PatientDTO;
 import com.medibook.api.dto.Rating.SubcategoryCountDTO;
 import com.medibook.api.entity.Badge;
-import com.medibook.api.entity.FamilyMember;
 import com.medibook.api.entity.TurnAssigned;
 import com.medibook.api.entity.User;
 import com.medibook.api.mapper.DoctorMapper;
@@ -40,17 +40,17 @@ public class DoctorService {
     private final BadgeRepository badgeRepository;
     private final BadgeService badgeService;
 
-    public List<DoctorDTO> getAllDoctors() {
+    public List<DoctorPublicDTO> getAllDoctors() {
         List<User> doctors = userRepository.findDoctorsByStatus("ACTIVE");
         return doctors.stream()
-                .map(doctorMapper::toDTO)
+                .map(doctorMapper::toPublicDTO)
                 .collect(Collectors.toList());
     }
 
-    public List<DoctorDTO> getDoctorsBySpecialty(String specialty) {
+    public List<DoctorPublicDTO> getDoctorsBySpecialty(String specialty) {
         List<User> doctors = userRepository.findDoctorsByStatusAndSpecialty("ACTIVE", specialty);
         return doctors.stream()
-                .map(doctorMapper::toDTO)
+                .map(doctorMapper::toPublicDTO)
                 .collect(Collectors.toList());
     }
 

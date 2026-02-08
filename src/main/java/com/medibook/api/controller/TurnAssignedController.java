@@ -9,9 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.medibook.api.dto.Turn.TurnCreateRequestDTO;
-import com.medibook.api.dto.Turn.TurnReserveRequestDTO;
 import com.medibook.api.dto.Turn.TurnResponseDTO;
-import com.medibook.api.entity.TurnAssigned;
 
 import static com.medibook.api.util.DateTimeUtils.ARGENTINA_ZONE;
 import com.medibook.api.entity.User;

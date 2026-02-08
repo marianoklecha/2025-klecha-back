@@ -2,6 +2,7 @@ package com.medibook.api.controller;
 
 import com.medibook.api.dto.Availability.*;
 import com.medibook.api.dto.DoctorDTO;
+import com.medibook.api.dto.DoctorPublicDTO;
 import com.medibook.api.dto.DoctorMetricsDTO;
 import com.medibook.api.dto.PatientDTO;
 import com.medibook.api.dto.UpdateMedicalHistoryRequestDTO;
@@ -34,14 +35,14 @@ public class DoctorController {
     private final MedicalHistoryService medicalHistoryService;
 
     @GetMapping
-    public ResponseEntity<List<DoctorDTO>> getAllDoctors() {
-        List<DoctorDTO> doctors = doctorService.getAllDoctors();
+    public ResponseEntity<List<DoctorPublicDTO>> getAllDoctors() {
+        List<DoctorPublicDTO> doctors = doctorService.getAllDoctors();
         return ResponseEntity.ok(doctors);
     }
 
     @GetMapping("/specialty/{specialty}")
-    public ResponseEntity<List<DoctorDTO>> getDoctorsBySpecialty(@PathVariable String specialty) {
-        List<DoctorDTO> doctors = doctorService.getDoctorsBySpecialty(specialty);
+    public ResponseEntity<List<DoctorPublicDTO>> getDoctorsBySpecialty(@PathVariable String specialty) {
+        List<DoctorPublicDTO> doctors = doctorService.getDoctorsBySpecialty(specialty);
         return ResponseEntity.ok(doctors);
     }
 
