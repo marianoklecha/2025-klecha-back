@@ -1,7 +1,9 @@
 package com.medibook.api.mapper;
+
 import com.medibook.api.dto.Badge.BadgeDTO;
-import com.medibook.api.service.BadgeService;
 import com.medibook.api.dto.DoctorDTO;
+import com.medibook.api.dto.DoctorPublicDTO;
+import com.medibook.api.service.BadgeService;
 import com.medibook.api.entity.Badge;
 import com.medibook.api.entity.User;
 import com.medibook.api.repository.BadgeRepository;
@@ -16,6 +18,21 @@ public class DoctorMapper {
 
     private final BadgeRepository badgeRepository;
     private final BadgeService badgeService;
+
+    public DoctorPublicDTO toPublicDTO(User user) {
+        if (user == null || user.getDoctorProfile() == null) {
+            return null;
+        }
+
+        return DoctorPublicDTO.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .surname(user.getSurname())
+                .medicalLicense(user.getDoctorProfile().getMedicalLicense())
+                .specialty(user.getDoctorProfile().getSpecialty())
+                .score(user.getScore())
+                .build();
+    }
 
     public DoctorDTO toDTO(User user) {
         if (user == null || user.getDoctorProfile() == null) {

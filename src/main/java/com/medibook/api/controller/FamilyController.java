@@ -5,6 +5,8 @@ import com.medibook.api.dto.Family.FamilyMemberDTO;
 import com.medibook.api.entity.User;
 import com.medibook.api.service.FamilyService;
 import com.medibook.api.util.AuthorizationUtil;
+
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/family")
@@ -58,4 +61,35 @@ public class FamilyController {
         List<FamilyMemberDTO> members = familyService.getFamilyMembersByHolder(authenticatedUser.getId());
         return ResponseEntity.ok(members);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> updateFamilyMember(
+        @PathVariable UUID id,
+        @Valid @RequestBody FamilyMemberCreateRequestDTO dto,
+        HttpServletRequest request) {
+            
+            User authenticatedUser = (User) request.getAttribute("authenticatedUser");
+
+            if (!AuthorizationUtil.isPatient(authenticatedUser)){
+                return new ResponseEntity<>(
+                    Map.of("error", "Forbidden", "message", "Only patients can update family members"),
+                    HttpStatus.FORBIDDEN);                    
+            }
+
+            try {
+                FamilyMemberDTO updatedFamilyMember = familyService.updateFamilyMember(authenticatedUser.getId(), id, dto);
+                return ResponseEntity.ok(updatedFamilyMember);
+            } catch ( EntityNotFoundException e ) {
+                return new ResponseEntity<>(
+                    Map.of("error", "Not Found", "message", e.getMessage()),
+                    HttpStatus.NOT_FOUND
+                );
+            } catch ( IllegalArgumentException e ) {
+                return new ResponseEntity<>(
+                    Map.of("error", "Bad request", "message", e.getMessage()),
+                    HttpStatus.BAD_REQUEST
+                );
+            }
+
+        }
 }

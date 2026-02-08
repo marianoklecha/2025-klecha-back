@@ -27,8 +27,6 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Base64;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
-
 
 @Service
 @Slf4j

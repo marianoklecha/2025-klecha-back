@@ -1,6 +1,6 @@
 package com.medibook.api.service;
 
-import com.medibook.api.dto.DoctorDTO;
+import com.medibook.api.dto.DoctorPublicDTO;
 import com.medibook.api.dto.PatientDTO;
 import com.medibook.api.entity.DoctorProfile;
 import com.medibook.api.entity.User;
@@ -56,8 +56,8 @@ class DoctorServiceComprehensiveTest {
     private User patientUser2;
     private DoctorProfile doctorProfile1;
     private DoctorProfile doctorProfile2;
-    private DoctorDTO doctorDTO1;
-    private DoctorDTO doctorDTO2;
+    private DoctorPublicDTO doctorDTO1;
+    private DoctorPublicDTO doctorDTO2;
     private UUID doctorId1;
     private UUID doctorId2;
     private UUID patientId1;
@@ -93,24 +93,20 @@ class DoctorServiceComprehensiveTest {
         doctorUser1.setDoctorProfile(doctorProfile1);
         doctorUser2.setDoctorProfile(doctorProfile2);
 
-        doctorDTO1 = DoctorDTO.builder()
+        doctorDTO1 = DoctorPublicDTO.builder()
                 .id(doctorId1)
                 .name("Doctor")
                 .surname("One")
-                .email("doctor1@test.com")
                 .specialty("Cardiología")
                 .medicalLicense("MED123456")
-                .slotDurationMin(30)
                 .build();
 
-        doctorDTO2 = DoctorDTO.builder()
+        doctorDTO2 = DoctorPublicDTO.builder()
                 .id(doctorId2)
                 .name("Doctor")
                 .surname("Two")
-                .email("doctor2@test.com")
                 .specialty("Neurología")
                 .medicalLicense("MED789012")
-                .slotDurationMin(45)
                 .build();
         
         // Set up default mocks for medical history service (lenient because not all tests use them)
@@ -142,19 +138,19 @@ class DoctorServiceComprehensiveTest {
     @Test
     void getAllDoctors_ActiveDoctorsExist_ReturnsListOfDoctors() {        List<User> doctors = Arrays.asList(doctorUser1, doctorUser2);
         when(userRepository.findDoctorsByStatus("ACTIVE")).thenReturn(doctors);
-        when(doctorMapper.toDTO(doctorUser1)).thenReturn(doctorDTO1);
-        when(doctorMapper.toDTO(doctorUser2)).thenReturn(doctorDTO2);        List<DoctorDTO> result = doctorService.getAllDoctors();        assertNotNull(result);
+        when(doctorMapper.toPublicDTO(doctorUser1)).thenReturn(doctorDTO1);
+        when(doctorMapper.toPublicDTO(doctorUser2)).thenReturn(doctorDTO2);        List<DoctorPublicDTO> result = doctorService.getAllDoctors();        assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals(doctorDTO1, result.get(0));
         assertEquals(doctorDTO2, result.get(1));
         
         verify(userRepository).findDoctorsByStatus("ACTIVE");
-        verify(doctorMapper).toDTO(doctorUser1);
-        verify(doctorMapper).toDTO(doctorUser2);
+        verify(doctorMapper).toPublicDTO(doctorUser1);
+        verify(doctorMapper).toPublicDTO(doctorUser2);
     }
 
     @Test
-    void getAllDoctors_NoDoctorsExist_ReturnsEmptyList() {        when(userRepository.findDoctorsByStatus("ACTIVE")).thenReturn(Collections.emptyList());        List<DoctorDTO> result = doctorService.getAllDoctors();        assertNotNull(result);
+    void getAllDoctors_NoDoctorsExist_ReturnsEmptyList() {        when(userRepository.findDoctorsByStatus("ACTIVE")).thenReturn(Collections.emptyList());        List<DoctorPublicDTO> result = doctorService.getAllDoctors();        assertNotNull(result);
         assertTrue(result.isEmpty());
         
         verify(userRepository).findDoctorsByStatus("ACTIVE");
@@ -162,7 +158,7 @@ class DoctorServiceComprehensiveTest {
     }
 
     @Test
-    void getAllDoctors_OnlyInactiveDoctors_ReturnsEmptyList() {        when(userRepository.findDoctorsByStatus("ACTIVE")).thenReturn(Collections.emptyList());        List<DoctorDTO> result = doctorService.getAllDoctors();        assertNotNull(result);
+    void getAllDoctors_OnlyInactiveDoctors_ReturnsEmptyList() {        when(userRepository.findDoctorsByStatus("ACTIVE")).thenReturn(Collections.emptyList());        List<DoctorPublicDTO> result = doctorService.getAllDoctors();        assertNotNull(result);
         assertTrue(result.isEmpty());
         
         verify(userRepository).findDoctorsByStatus("ACTIVE");
@@ -173,18 +169,18 @@ class DoctorServiceComprehensiveTest {
     void getDoctorsBySpecialty_ValidSpecialty_ReturnsFilteredDoctors() {        String specialty = "Cardiología";
         List<User> doctors = Arrays.asList(doctorUser1);
         when(userRepository.findDoctorsByStatusAndSpecialty("ACTIVE", specialty)).thenReturn(doctors);
-        when(doctorMapper.toDTO(doctorUser1)).thenReturn(doctorDTO1);        List<DoctorDTO> result = doctorService.getDoctorsBySpecialty(specialty);        assertNotNull(result);
+        when(doctorMapper.toPublicDTO(doctorUser1)).thenReturn(doctorDTO1);        List<DoctorPublicDTO> result = doctorService.getDoctorsBySpecialty(specialty);        assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(doctorDTO1, result.get(0));
         assertEquals("Cardiología", result.get(0).getSpecialty());
         
         verify(userRepository).findDoctorsByStatusAndSpecialty("ACTIVE", specialty);
-        verify(doctorMapper).toDTO(doctorUser1);
+        verify(doctorMapper).toPublicDTO(doctorUser1);
     }
 
     @Test
     void getDoctorsBySpecialty_NonExistentSpecialty_ReturnsEmptyList() {        String specialty = "Dermatología";
-        when(userRepository.findDoctorsByStatusAndSpecialty("ACTIVE", specialty)).thenReturn(Collections.emptyList());        List<DoctorDTO> result = doctorService.getDoctorsBySpecialty(specialty);        assertNotNull(result);
+        when(userRepository.findDoctorsByStatusAndSpecialty("ACTIVE", specialty)).thenReturn(Collections.emptyList());        List<DoctorPublicDTO> result = doctorService.getDoctorsBySpecialty(specialty);        assertNotNull(result);
         assertTrue(result.isEmpty());
         
         verify(userRepository).findDoctorsByStatusAndSpecialty("ACTIVE", specialty);
@@ -195,11 +191,11 @@ class DoctorServiceComprehensiveTest {
     void getDoctorsBySpecialty_CaseInsensitiveSpecialty_ReturnsFilteredDoctors() {        String specialty = "CARDIOLOGÍA";
         List<User> doctors = Arrays.asList(doctorUser1);
         when(userRepository.findDoctorsByStatusAndSpecialty("ACTIVE", specialty)).thenReturn(doctors);
-        when(doctorMapper.toDTO(doctorUser1)).thenReturn(doctorDTO1);        List<DoctorDTO> result = doctorService.getDoctorsBySpecialty(specialty);        assertNotNull(result);
+        when(doctorMapper.toPublicDTO(doctorUser1)).thenReturn(doctorDTO1);        List<DoctorPublicDTO> result = doctorService.getDoctorsBySpecialty(specialty);        assertNotNull(result);
         assertEquals(1, result.size());
         
         verify(userRepository).findDoctorsByStatusAndSpecialty("ACTIVE", specialty);
-        verify(doctorMapper).toDTO(doctorUser1);
+        verify(doctorMapper).toPublicDTO(doctorUser1);
     }
 
     @Test
@@ -330,18 +326,18 @@ class DoctorServiceComprehensiveTest {
     @Test
     void getAllDoctors_MapperThrowsException_PropagatesException() {        List<User> doctors = Arrays.asList(doctorUser1);
         when(userRepository.findDoctorsByStatus("ACTIVE")).thenReturn(doctors);
-        when(doctorMapper.toDTO(doctorUser1)).thenThrow(new RuntimeException("Mapping error"));        RuntimeException exception = assertThrows(RuntimeException.class, 
+        when(doctorMapper.toPublicDTO(doctorUser1)).thenThrow(new RuntimeException("Mapping error"));        RuntimeException exception = assertThrows(RuntimeException.class, 
                 () -> doctorService.getAllDoctors());
         
         assertEquals("Mapping error", exception.getMessage());
         
         verify(userRepository).findDoctorsByStatus("ACTIVE");
-        verify(doctorMapper).toDTO(doctorUser1);
+        verify(doctorMapper).toPublicDTO(doctorUser1);
     }
 
     @Test
     void getDoctorsBySpecialty_NullSpecialty_HandlesGracefully() {        when(userRepository.findDoctorsByStatusAndSpecialty("ACTIVE", null))
-                .thenReturn(Collections.emptyList());        List<DoctorDTO> result = doctorService.getDoctorsBySpecialty(null);        assertNotNull(result);
+                .thenReturn(Collections.emptyList());        List<DoctorPublicDTO> result = doctorService.getDoctorsBySpecialty(null);        assertNotNull(result);
         assertTrue(result.isEmpty());
         
         verify(userRepository).findDoctorsByStatusAndSpecialty("ACTIVE", null);
@@ -351,7 +347,7 @@ class DoctorServiceComprehensiveTest {
     @Test
     void getDoctorsBySpecialty_EmptySpecialty_HandlesGracefully() {        String emptySpecialty = "";
         when(userRepository.findDoctorsByStatusAndSpecialty("ACTIVE", emptySpecialty))
-                .thenReturn(Collections.emptyList());        List<DoctorDTO> result = doctorService.getDoctorsBySpecialty(emptySpecialty);        assertNotNull(result);
+                .thenReturn(Collections.emptyList());        List<DoctorPublicDTO> result = doctorService.getDoctorsBySpecialty(emptySpecialty);        assertNotNull(result);
         assertTrue(result.isEmpty());
         
         verify(userRepository).findDoctorsByStatusAndSpecialty("ACTIVE", emptySpecialty);
@@ -370,17 +366,17 @@ class DoctorServiceComprehensiveTest {
 
     @Test
     void getAllDoctors_LargeNumberOfDoctors_HandlesEfficiently() {        List<User> largeDoctorList = Collections.nCopies(1000, doctorUser1);
-        DoctorDTO largeDoctorDTOList = doctorDTO1;
+        DoctorPublicDTO largeDoctorPublicDTOList = doctorDTO1;
         
         when(userRepository.findDoctorsByStatus("ACTIVE")).thenReturn(largeDoctorList);
-        when(doctorMapper.toDTO(any(User.class))).thenReturn(largeDoctorDTOList);        long startTime = System.currentTimeMillis();
-        List<DoctorDTO> result = doctorService.getAllDoctors();
+        when(doctorMapper.toPublicDTO(any(User.class))).thenReturn(largeDoctorPublicDTOList);        long startTime = System.currentTimeMillis();
+        List<DoctorPublicDTO> result = doctorService.getAllDoctors();
         long endTime = System.currentTimeMillis();        assertNotNull(result);
         assertEquals(1000, result.size());
         assertTrue(endTime - startTime < 1000, "Should handle large doctor list efficiently");
         
         verify(userRepository).findDoctorsByStatus("ACTIVE");
-        verify(doctorMapper, times(1000)).toDTO(any(User.class));
+        verify(doctorMapper, times(1000)).toPublicDTO(any(User.class));
     }
 
     @Test
