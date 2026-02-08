@@ -14,7 +14,7 @@ public record ProfileUpdateRequestDTO(
     @Size(min = 1, max = 50, message = "Surname must be between 1 and 50 characters") 
     String surname,
 
-    @Size(max = 20, message = "Phone must be less than 20 characters")
+    @Pattern(regexp = "^\\+?[0-9]{8,15}$", message = "Invalid phone format")
     String phone,
     
     LocalDate birthdate,
