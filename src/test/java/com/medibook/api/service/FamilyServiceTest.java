@@ -176,4 +176,110 @@ class FamilyServiceTest {
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }
+
+    @Test
+    void updateFamilyMember_Success() {
+        // Arrange
+        UUID holderId = UUID.randomUUID();
+        User holder = new User();
+        holder.setId(holderId);
+
+        UUID memberId = UUID.randomUUID();
+        FamilyMember existingMember = new FamilyMember();
+        existingMember.setId(memberId);
+        existingMember.setHolder(holder);
+        existingMember.setName("OldName");
+        existingMember.setSurname("OldSurname");
+        existingMember.setDni(11111111L);
+        existingMember.setBirthdate(LocalDate.of(2010, 1, 1));
+        existingMember.setGender("M");
+        existingMember.setRelationship("Hijo");
+
+        FamilyMemberCreateRequestDTO updateDTO = new FamilyMemberCreateRequestDTO();
+        updateDTO.setName("NewName");
+        updateDTO.setSurname("NewSurname");
+        updateDTO.setDni(11111111L); // Same DNI
+        updateDTO.setBirthdate(LocalDate.of(2010, 1, 1));
+        updateDTO.setGender("M");
+        updateDTO.setRelationship("Hijo");
+
+        when(familyMemberRepository.findById(memberId)).thenReturn(Optional.of(existingMember));
+        when(familyMemberRepository.save(any(FamilyMember.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        FamilyMemberDTO result = familyService.updateFamilyMember(holderId, memberId, updateDTO);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("NewName", result.getName());
+        assertEquals("NewSurname", result.getSurname());
+        verify(familyMemberRepository).save(existingMember);
+    }
+
+    @Test
+    void updateFamilyMember_MemberNotFound_ThrowsException() {
+        // Arrange
+        UUID holderId = UUID.randomUUID();
+        UUID memberId = UUID.randomUUID();
+        FamilyMemberCreateRequestDTO updateDTO = new FamilyMemberCreateRequestDTO();
+
+        when(familyMemberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(EntityNotFoundException.class, () -> 
+            familyService.updateFamilyMember(holderId, memberId, updateDTO)
+        );
+        verify(familyMemberRepository, never()).save(any());
+    }
+
+    @Test
+    void updateFamilyMember_UnauthorizedHolder_ThrowsException() {
+        // Arrange
+        UUID holderId = UUID.randomUUID();
+        UUID otherHolderId = UUID.randomUUID();
+        
+        User otherHolder = new User();
+        otherHolder.setId(otherHolderId);
+
+        UUID memberId = UUID.randomUUID();
+        FamilyMember existingMember = new FamilyMember();
+        existingMember.setId(memberId);
+        existingMember.setHolder(otherHolder); // Different holder
+
+        FamilyMemberCreateRequestDTO updateDTO = new FamilyMemberCreateRequestDTO();
+
+        when(familyMemberRepository.findById(memberId)).thenReturn(Optional.of(existingMember));
+
+        // Act & Assert
+        assertThrows(EntityNotFoundException.class, () -> 
+            familyService.updateFamilyMember(holderId, memberId, updateDTO)
+        );
+        verify(familyMemberRepository, never()).save(any());
+    }
+
+    @Test
+    void updateFamilyMember_DniCollision_ThrowsException() {
+        // Arrange
+        UUID holderId = UUID.randomUUID();
+        User holder = new User();
+        holder.setId(holderId);
+
+        UUID memberId = UUID.randomUUID();
+        FamilyMember existingMember = new FamilyMember();
+        existingMember.setId(memberId);
+        existingMember.setHolder(holder);
+        existingMember.setDni(11111111L);
+
+        FamilyMemberCreateRequestDTO updateDTO = new FamilyMemberCreateRequestDTO();
+        updateDTO.setDni(22222222L); // New DNI
+
+        when(familyMemberRepository.findById(memberId)).thenReturn(Optional.of(existingMember));
+        when(userRepository.existsByDni(updateDTO.getDni())).thenReturn(true);
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> 
+            familyService.updateFamilyMember(holderId, memberId, updateDTO)
+        );
+        verify(familyMemberRepository, never()).save(any());
+    }
 }
