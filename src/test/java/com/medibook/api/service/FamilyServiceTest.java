@@ -17,6 +17,7 @@ import com.medibook.api.repository.UserRepository;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -281,5 +282,71 @@ class FamilyServiceTest {
             familyService.updateFamilyMember(holderId, memberId, updateDTO)
         );
         verify(familyMemberRepository, never()).save(any());
+    }
+
+    @Test
+    void getFamilyMembersByHolderList_Success() {
+        // Arrange
+        UUID holder1Id = UUID.randomUUID();
+        User holder1 = new User();
+        holder1.setId(holder1Id);
+
+        UUID holder2Id = UUID.randomUUID();
+        User holder2 = new User();
+        holder2.setId(holder2Id);
+
+        FamilyMember member1 = new FamilyMember();
+        member1.setId(UUID.randomUUID());
+        member1.setName("Member1");
+        member1.setSurname("Family1");
+        member1.setHolder(holder1);
+        member1.setDni(111L);
+        member1.setBirthdate(LocalDate.of(2015, 1, 1));
+        member1.setGender("M");
+        member1.setRelationship("Son");
+
+        FamilyMember member2 = new FamilyMember();
+        member2.setId(UUID.randomUUID());
+        member2.setName("Member2");
+        member2.setSurname("Family2");
+        member2.setHolder(holder2);
+        member2.setDni(222L);
+        member2.setBirthdate(LocalDate.of(2016, 1, 1));
+        member2.setGender("F");
+        member2.setRelationship("Daughter");
+
+        List<UUID> holderIds = List.of(holder1Id, holder2Id);
+        when(familyMemberRepository.findByHolderIdIn(holderIds)).thenReturn(List.of(member1, member2));
+
+        // Act
+        Map<UUID, List<FamilyMemberDTO>> result = familyService.getFamilyMembersByHolder(holderIds);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertTrue(result.containsKey(holder1Id));
+        assertTrue(result.containsKey(holder2Id));
+        
+        assertEquals(1, result.get(holder1Id).size());
+        assertEquals("Member1", result.get(holder1Id).get(0).getName());
+        
+        assertEquals(1, result.get(holder2Id).size());
+        assertEquals("Member2", result.get(holder2Id).get(0).getName());
+    }
+
+    @Test
+    void getFamilyMembersByHolderList_EmptyInput_ReturnsEmptyMap() {
+        // Act
+        Map<UUID, List<FamilyMemberDTO>> resultNull = familyService.getFamilyMembersByHolder((List<UUID>) null);
+        Map<UUID, List<FamilyMemberDTO>> resultEmpty = familyService.getFamilyMembersByHolder(Collections.emptyList());
+
+        // Assert
+        assertNotNull(resultNull);
+        assertTrue(resultNull.isEmpty());
+        
+        assertNotNull(resultEmpty);
+        assertTrue(resultEmpty.isEmpty());
+        
+        verify(familyMemberRepository, never()).findByHolderIdIn(any());
     }
 }
