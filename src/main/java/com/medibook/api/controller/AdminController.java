@@ -200,9 +200,9 @@ public class AdminController {
         }
 
         try {
-            long patientsCount = userRepository.countByRole("PATIENT");
-            long doctorsCount = userRepository.countByRoleAndStatus("DOCTOR", "ACTIVE");
-            long pendingCount = userRepository.countByRoleAndStatus("DOCTOR", "PENDING");
+            long patientsCount = userRepository.countByRoleAndEmailVerified("PATIENT", true);
+            long doctorsCount = userRepository.countByRoleAndStatusAndEmailVerified("DOCTOR", "ACTIVE", true);
+            long pendingCount = userRepository.countByRoleAndStatusAndEmailVerified("DOCTOR", "PENDING", true);
             long familyMembersCount = familyMemberRepository.count();
 
             AdminStatsDTO stats = new AdminStatsDTO(
