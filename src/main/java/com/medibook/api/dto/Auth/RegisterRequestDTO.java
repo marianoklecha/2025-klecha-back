@@ -11,7 +11,7 @@ public record RegisterRequestDTO(
 
     @NotNull(message = "DNI is required")
     @Min(value = 1000000L, message = "DNI must be at least 7 digits")
-    @Max(value = 999999999L, message = "DNI must be at most 9 digits")
+    @Max(value = 99999999L, message = "DNI must be at most 8 digits")
     Long dni,
 
     @NotBlank(message = "Password is required")
@@ -42,7 +42,7 @@ public record RegisterRequestDTO(
     @Pattern(regexp = "^(MALE|FEMALE)$", message = "Gender must be MALE or FEMALE")
     String gender,
 
-    @Size(max = 50, message = "Medical license must be less than 50 characters")
+    @Pattern(regexp = "^[0-9]{4,10}$", message = "Medical license must be numeric and between 4 and 10 digits")
     String medicalLicense,
     
     @Size(max = 100, message = "Specialty must be less than 100 characters")

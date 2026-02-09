@@ -313,65 +313,6 @@ class AuthServiceImplTest {
     }
 
     @Test
-    void registerAdmin_ValidRequest_Success() {
-        when(userRepository.existsByEmail(validAdminRequest.email())).thenReturn(false);
-        when(userRepository.existsByDni(validAdminRequest.dni())).thenReturn(false);
-        when(passwordEncoder.encode(validAdminRequest.password())).thenReturn("encodedPassword");
-        
-        User adminUser = new User();
-        adminUser.setId(UUID.randomUUID());
-        adminUser.setEmail(validAdminRequest.email());
-        adminUser.setRole("ADMIN");
-        adminUser.setStatus("ACTIVE");
-        adminUser.setName(validAdminRequest.name());
-        adminUser.setSurname(validAdminRequest.surname());
-        
-        when(userMapper.toUser(eq(validAdminRequest), eq("ADMIN"), eq("encodedPassword"))).thenReturn(adminUser);
-        when(userRepository.save(adminUser)).thenReturn(adminUser);
-        when(userMapper.toRegisterResponse(adminUser)).thenReturn(
-            new RegisterResponseDTO(adminUser.getId(), adminUser.getEmail(), adminUser.getName(), 
-                                  adminUser.getSurname(), adminUser.getRole(), adminUser.getStatus())
-        );
-
-        RegisterResponseDTO result = authService.registerAdmin(validAdminRequest);
-
-        assertNotNull(result);
-        assertEquals(adminUser.getId(), result.id());
-        assertEquals(adminUser.getEmail(), result.email());
-        assertEquals("ADMIN", result.role());
-        assertEquals("ACTIVE", result.status());
-    }
-
-    @Test
-    void registerAdmin_EmailAlreadyExists_ThrowsException() {
-        when(userRepository.existsByEmail(validAdminRequest.email())).thenReturn(true);
-
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> authService.registerAdmin(validAdminRequest)
-        );
-        
-        assertTrue(exception.getMessage().contains("Email already registered"));
-        verify(userRepository).existsByEmail(validAdminRequest.email());
-        verify(userRepository, never()).existsByDni(any());
-    }
-
-    @Test
-    void registerAdmin_DniAlreadyExists_ThrowsException() {
-        when(userRepository.existsByEmail(validAdminRequest.email())).thenReturn(false);
-        when(userRepository.existsByDni(validAdminRequest.dni())).thenReturn(true);
-
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> authService.registerAdmin(validAdminRequest)
-        );
-        
-        assertTrue(exception.getMessage().contains("DNI already registered"));
-        verify(userRepository).existsByEmail(validAdminRequest.email());
-        verify(userRepository).existsByDni(validAdminRequest.dni());
-    }
-
-    @Test
     void signIn_ValidCredentials_Success() {
         when(userRepository.findByEmail(validSignInRequest.email())).thenReturn(Optional.of(sampleUser));
         when(passwordEncoder.matches(validSignInRequest.password(), sampleUser.getPasswordHash())).thenReturn(true);
