@@ -45,7 +45,7 @@ public class SecurityConfig {
                 var config = new org.springframework.web.cors.CorsConfiguration();
                 config.setAllowedOrigins(java.util.Arrays.asList(allowedOrigins.split(",")));
                 config.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-                config.setAllowedHeaders(java.util.Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
+                config.setAllowedHeaders(java.util.Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", "Refresh-Token"));
                 config.setAllowCredentials(true);
                 config.setMaxAge(3600L); 
                 return config;
