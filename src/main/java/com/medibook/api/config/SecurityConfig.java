@@ -17,15 +17,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
+    private final RateLimitFilter rateLimitFilter;
     private final JwtAuthenticationEntryEndpoint jwtAuthenticationEntryEndpoint;
 
     @Value("${CORS_ALLOWED_ORIGINS:http://localhost:5173}")
     private String allowedOrigins;
 
     public SecurityConfig(TokenAuthenticationFilter tokenAuthenticationFilter,
+                            RateLimitFilter rateLimitFilter,
                             JwtAuthenticationEntryEndpoint jwtAuthenticationEntryEndpoint) {
         
         this.tokenAuthenticationFilter = tokenAuthenticationFilter;
+        this.rateLimitFilter = rateLimitFilter;
         this.jwtAuthenticationEntryEndpoint = jwtAuthenticationEntryEndpoint;
     }
 
@@ -41,11 +44,20 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(request -> {
                 var config = new org.springframework.web.cors.CorsConfiguration();
                 config.setAllowedOrigins(java.util.Arrays.asList(allowedOrigins.split(",")));
-                config.setAllowedMethods(java.util.Arrays.asList("*"));
-                config.setAllowedHeaders(java.util.Arrays.asList("*"));
+                config.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+                config.setAllowedHeaders(java.util.Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
                 config.setAllowCredentials(true);
+                config.setMaxAge(3600L); 
                 return config;
             }))
+            .headers(headers -> headers
+                .frameOptions(frame -> frame.deny()) 
+                .xssProtection(xss -> xss.disable()) 
+                .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'")) 
+                .httpStrictTransportSecurity(hsts -> hsts
+                    .includeSubDomains(true)
+                    .maxAgeInSeconds(31536000))
+            )
             .authorizeHttpRequests(authz -> authz
                 // Rutas públicas
                 .requestMatchers("/api/auth/**").permitAll()
@@ -57,6 +69,7 @@ public class SecurityConfig {
             .exceptionHandling(exception -> exception
                 .authenticationEntryPoint(jwtAuthenticationEntryEndpoint)
             )
+            .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();

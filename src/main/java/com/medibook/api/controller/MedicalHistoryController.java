@@ -20,8 +20,7 @@ public class MedicalHistoryController {
     private final MedicalHistoryService medicalHistoryService;
 
     @GetMapping("/patient/{patientId}")
-    @PreAuthorize("hasRole('PATIENT') and authentication.principal.id.equals(#patientId) or hasRole('DOCTOR') or hasRole('ADMIN')")
-    public ResponseEntity<List<MedicalHistoryDTO>> getPatientMedicalHistory(@PathVariable UUID patientId) {
+    @PreAuthorize("(hasRole('PATIENT') and authentication.principal.id.equals(#patientId)) or (hasRole('DOCTOR') and @turnAssignedRepository.existsByDoctor_IdAndPatient_Id(authentication.principal.id, #patientId))")    public ResponseEntity<List<MedicalHistoryDTO>> getPatientMedicalHistory(@PathVariable UUID patientId) {
         List<MedicalHistoryDTO> histories = medicalHistoryService.getPatientMedicalHistory(patientId);
         return ResponseEntity.ok(histories);
     }
