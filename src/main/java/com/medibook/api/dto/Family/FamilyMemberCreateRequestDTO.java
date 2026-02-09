@@ -37,6 +37,6 @@ public class FamilyMemberCreateRequestDTO {
     String gender;
 
     @NotBlank(message = "El tipo de relación es obligatorio")
-    @Pattern(regexp = "^(Hijo|Hija|Madre|Padre|Hermano|Hermana)$", message = "La relación no es válida")
+    @Pattern(regexp = "^(Nieto|Nieta|Hijo|Hija|Madre|Padre|Hermano|Hermana|Abuelo|Abuela)$", message = "La relación no es válida")
     private String relationship;
 }
