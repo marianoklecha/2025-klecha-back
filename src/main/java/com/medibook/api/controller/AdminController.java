@@ -12,6 +12,7 @@ import com.medibook.api.mapper.AdminMapper;
 import com.medibook.api.mapper.RatingMapper;
 import com.medibook.api.repository.RatingRepository;
 import com.medibook.api.repository.UserRepository;
+import com.medibook.api.repository.FamilyMemberRepository;
 import com.medibook.api.service.EmailService;
 import com.medibook.api.util.AuthorizationUtil;
 import com.medibook.api.util.ErrorResponseUtil;
@@ -36,14 +37,17 @@ public class AdminController {
     private final EmailService emailService;
     private final RatingRepository ratingRepository;
     private final RatingMapper ratingMapper;
+    private final FamilyMemberRepository familyMemberRepository;
 
     public AdminController(UserRepository userRepository, AdminMapper adminMapper, EmailService emailService, 
-                          RatingRepository ratingRepository, RatingMapper ratingMapper) {
+                          RatingRepository ratingRepository, RatingMapper ratingMapper,
+                          FamilyMemberRepository familyMemberRepository) {
         this.userRepository = userRepository;
         this.adminMapper = adminMapper;
         this.emailService = emailService;
         this.ratingRepository = ratingRepository;
         this.ratingMapper = ratingMapper;
+        this.familyMemberRepository = familyMemberRepository;
     }
 
     @GetMapping("/pending-doctors")
@@ -199,11 +203,13 @@ public class AdminController {
             long patientsCount = userRepository.countByRoleAndEmailVerified("PATIENT", true);
             long doctorsCount = userRepository.countByRoleAndStatusAndEmailVerified("DOCTOR", "ACTIVE", true);
             long pendingCount = userRepository.countByRoleAndStatusAndEmailVerified("DOCTOR", "PENDING", true);
+            long familyMembersCount = familyMemberRepository.count();
 
             AdminStatsDTO stats = new AdminStatsDTO(
                 (int) patientsCount,
                 (int) doctorsCount,
-                (int) pendingCount
+                (int) pendingCount,
+                (int) familyMembersCount
             );
 
             return ResponseEntity.ok(stats);

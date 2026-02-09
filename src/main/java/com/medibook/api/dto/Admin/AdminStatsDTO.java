@@ -11,4 +11,5 @@ public class AdminStatsDTO {
     private int patients;
     private int doctors;
     private int pending;
+    private int familyMembers;
 }
